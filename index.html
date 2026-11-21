@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>YOU Know AI</title>
+    <script>
+        // ตั้งธีมก่อนวาดหน้า: ใช้ค่าที่เคยเลือกไว้ ถ้าไม่มีก็ตามระบบของเครื่อง
+        (function () {
+            var t = 'light';
+            try {
+                var saved = localStorage.getItem('youknowai-theme');
+                if (saved === 'light' || saved === 'dark') t = saved;
+                else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
+            } catch (e) {}
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <!-- นำเข้าฟอนต์ Bai Jamjuree จาก Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* ---------- ธีม: ตัวแปรสี (สว่าง/มืด) ---------- */
+        :root {
+            color-scheme: light;
+            --bg: #f4f6fb;
+            --surface: #ffffff;
+            --surface-2: #f1f4fb;
+            --border: #e0e5f1;
+            --text: #1c2541;
+            --muted: #5a6580;
+            --heading: #3730a3;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-ink: #ffffff;
+            --secondary: #0e7490;
+            --secondary-hover: #155e75;
+            --header-from: #4f46e5;
+            --header-to: #7c3aed;
+            --header-ink: #ffffff;
+            --nav-bg: #312e81;
+            --nav-text: #e0e7ff;
+            --nav-hover: rgba(255, 255, 255, 0.16);
+            --nav-active-bg: #ffffff;
+            --nav-active-ink: #312e81;
+            --info-bg: #eef2ff;
+            --info-border: #6366f1;
+            --info-text: #3730a3;
+            --selected-bg: #e0e7ff;
+            --ok-bg: #dcfce7;
+            --ok-border: #16a34a;
+            --ok-text: #14532d;
+            --bad-bg: #fee2e2;
+            --bad-border: #dc2626;
+            --bad-text: #7f1d1d;
+            --good: #15803d;
+            --warn: #d97706;
+            --focus: #f59e0b;
+            --shadow: 0 4px 18px rgba(49, 46, 129, 0.08);
+        }
+        :root[data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #0d1120;
+            --surface: #161b32;
+            --surface-2: #1d2442;
+            --border: #2b3560;
+            --text: #e8ecf8;
+            --muted: #a3adc9;
+            --heading: #c7d2fe;
+            --primary: #818cf8;
+            --primary-hover: #a5b4fc;
+            --primary-ink: #0d1120;
+            --secondary: #22d3ee;
+            --secondary-hover: #67e8f9;
+            --header-from: #1e1b4b;
+            --header-to: #3b2f8f;
+            --header-ink: #f1f5ff;
+            --nav-bg: #11162b;
+            --nav-text: #c7d2fe;
+            --nav-hover: rgba(129, 140, 248, 0.18);
+            --nav-active-bg: #818cf8;
+            --nav-active-ink: #0d1120;
+            --info-bg: #1b2447;
+            --info-border: #818cf8;
+            --info-text: #c7d2fe;
+            --selected-bg: #273266;
+            --ok-bg: #12341f;
+            --ok-border: #22c55e;
+            --ok-text: #bbf7d0;
+            --bad-bg: #3b1519;
+            --bad-border: #f87171;
+            --bad-text: #fecaca;
+            --good: #4ade80;
+            --warn: #fbbf24;
+            --focus: #fbbf24;
+            --shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Bai Jamjuree', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+        header {
+            position: relative;
+            background: linear-gradient(135deg, var(--header-from), var(--header-to));
+            color: var(--header-ink);
+            text-align: center;
+            padding: 38px 15px 34px;
+            box-shadow: var(--shadow);
+        }
+        header h1 { margin: 0 0 6px; font-size: 2rem; letter-spacing: 0.5px; }
+        header p { margin: 0; opacity: 0.92; }
+        .theme-toggle {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: rgba(255, 255, 255, 0.16);
+            color: var(--header-ink);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.28); }
+        nav {
+            background: var(--nav-bg);
+            padding: 10px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        nav a {
+            color: var(--nav-text);
+            text-decoration: none;
+            margin: 4px 3px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        /* เมาส์ชี้: ไฮไลต์จางๆ */
+        nav a:hover { background: var(--nav-hover); color: #fff; }
+        /* หน้าที่เปิดอยู่: ป้ายสีทึบ ตัวหนา แยกจากตอนเมาส์ชี้ชัดเจน */
+        nav a.active {
+            background: var(--nav-active-bg);
+            color: var(--nav-active-ink);
+            font-weight: bold;
+        }
+        nav a:focus-visible, .action-btn:focus-visible, .option-btn:focus-visible, .theme-toggle:focus-visible {
+            outline: 3px solid var(--focus);
+            outline-offset: 2px;
+        }
+        .container { max-width: 1000px; margin: auto; padding: 25px; }
+        .content {
+            background: var(--surface);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        h2 { color: var(--heading); }
+        h3, h4 { color: var(--text); }
+        .lead { color: var(--muted); margin-top: -10px; margin-bottom: 20px; }
+        .center { text-align: center; }
+        .center-title { text-align: center; color: var(--heading); margin-bottom: 25px; }
+        .divider { border: 0; border-top: 1px solid var(--border); margin: 25px 0; }
+        .cta { margin-top: 25px; text-align: center; }
+
+        /* ---------- หน้าแรก ---------- */
+        .steps { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 5px; }
+        .step {
+            flex: 1 1 200px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .step b { color: var(--heading); display: block; margin-bottom: 4px; }
+        .mindmap {
+            background: var(--surface-2);
+            border: 2px dashed var(--border);
+            padding: 25px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .mindmap-root {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--header-from), var(--header-to));
+            color: var(--header-ink);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .mindmap-arrow { font-size: 18px; color: var(--muted); margin-bottom: 15px; }
+        .mindmap-branches { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; text-align: left; }
+        .branch {
+            flex: 1 1 150px;
+            max-width: 210px;
+            background: var(--surface);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--secondary);
+            box-shadow: var(--shadow);
+        }
+        .branch .icon { font-size: 24px; margin-bottom: 5px; }
+        .branch strong { display: block; color: var(--heading); font-size: 14px; }
+        .branch small { color: var(--muted); font-size: 12px; }
+
+        /* ---------- หน้าความรู้ ---------- */
+        .topic-card {
+            background: var(--surface-2);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+        .topic-card h4 { margin-top: 0; color: var(--heading); }
+        .topic-card p { margin-bottom: 0; }
+
+        /* ---------- แบบทดสอบ ---------- */
+        .quiz-status {
+            display: flex;
+            justify-content: space-between;
+            background: var(--info-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--info-text);
+        }
+        .progress { height: 8px; background: var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+        .progress > div {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        .cat-tag {
+            display: inline-block;
+            font-size: 13px;
+            color: var(--info-text);
+            background: var(--info-bg);
+            border-radius: 20px;
+            padding: 2px 12px;
+            margin-bottom: 6px;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-btn:hover:not(:disabled) { background: var(--info-bg); border-color: var(--primary); }
+        .option-btn:disabled { cursor: default; }
+        .option-btn.correct { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-text); font-weight: bold; }
+        .option-btn.wrong { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad-text); }
+        /* ข้อสอบก่อนเรียน: ไม่เฉลย แค่แสดงว่าเลือกข้อไหน */
+        .option-btn.selected { background: var(--selected-bg); border-color: var(--primary); color: var(--text); font-weight: bold; }
+        .explanation-box {
+            display: none;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            background: var(--info-bg);
+            border-left: 4px solid var(--info-border);
+            line-height: 1.5;
+            color: var(--info-text);
+        }
+        .action-btn {
+            background: var(--primary);
+            color: var(--primary-ink);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        .action-btn:hover { background: var(--primary-hover); }
+        .action-btn.secondary { background: var(--secondary); color: var(--primary-ink); }
+        :root:not([data-theme="dark"]) .action-btn.secondary { color: #fff; }
+        .action-btn.secondary:hover { background: var(--secondary-hover); }
+        .action-btn.ghost {
+            background: transparent;
+            color: var(--heading);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 10px;
+            margin-right: 6px;
+        }
+        .action-btn.ghost:hover { background: var(--info-bg); }
+
+        /* ---------- หน้าสรุปผล ---------- */
+        .result-area { display: none; padding: 10px 0; }
+        .result-score { font-size: 28px; font-weight: bold; color: var(--primary); text-align: center; margin: 6px 0; }
+        .result-level { text-align: center; font-weight: bold; color: var(--heading); margin: 0 0 6px; }
+        .result-message { text-align: center; }
+        .result-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 18px 0;
+            text-align: left;
+        }
+        .result-box h4 { margin: 0 0 10px; color: var(--heading); }
+        .cat-row { margin-bottom: 10px; }
+        .cat-row .cat-head { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 4px; }
+        .cat-row .track { height: 10px; background: var(--border); border-radius: 6px; overflow: hidden; }
+        .cat-row .fill { height: 100%; background: var(--primary); }
+        .cat-row .fill.low { background: var(--warn); }
+        .compare { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center; text-align: center; }
+        .compare .num { font-size: 22px; font-weight: bold; color: var(--heading); }
+        .compare small { color: var(--muted); }
+        .compare .gain { font-size: 20px; font-weight: bold; }
+        .compare .gain.up { color: var(--good); }
+        .compare .gain.down { color: var(--bad-border); }
+        .review-item { border-top: 1px solid var(--border); padding: 12px 0; }
+        .review-item:first-of-type { border-top: 0; }
+        .review-item .rq { font-weight: bold; margin-bottom: 6px; }
+        .review-item .mine { color: var(--bad-border); }
+        .review-item .right { color: var(--good); }
+        .review-item .why { color: var(--info-text); font-size: 15px; margin-top: 4px; }
+        .result-actions { text-align: center; }
+        .result-actions .action-btn { margin: 15px 4px 0; }
+
+        /* ---------- ประวัติผล ---------- */
+        .history-note { color: var(--muted); font-size: 14px; margin: 0 0 8px; }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        .history-table th, .history-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+        .history-table th { color: var(--muted); font-weight: 500; font-size: 13px; }
+        .history-table tr.is-latest td { font-weight: bold; color: var(--heading); }
+        .history-wrap { overflow-x: auto; }
+
+        /* ---------- เกี่ยวกับเรา ---------- */
+        .team-list { list-style: none; padding: 0; margin: 10px 0 0; }
+        .team-list li {
+            background: var(--surface-2);
+            border-left: 4px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+        }
+        .info-grid { display: grid; grid-template-columns: 170px 1fr; gap: 6px 14px; margin: 10px 0 0; }
+        .info-grid dt { color: var(--heading); font-weight: bold; }
+        .info-grid dd { margin: 0; }
+
+        footer {
+            background: var(--nav-bg);
+            color: var(--nav-text);
+            text-align: center;
+            padding: 20px;
+        }
+        footer p { margin: 0; }
+        @media (max-width: 600px) {
+            .container { padding: 14px; }
+            .content { padding: 18px; }
+            header { padding-top: 56px; }
+            nav a { margin: 3px 2px; padding: 8px 10px; font-size: 15px; }
+            .info-grid { grid-template-columns: 1fr; }
+            .info-grid dt { margin-top: 6px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button class="theme-toggle" id="theme-toggle" type="button" onclick="toggleTheme()"></button>
+        <h1>YOU Know AI</h1>
+        <p>แหล่งเรียนรู้และแบ่งปันความรู้สำหรับทุกคน</p>
+    </header>
+    <nav>
+        <a href="javascript:void(0)" id="nav-home" class="active" onclick="showPage('home')">หน้าแรก</a>
+        <a href="javascript:void(0)" id="nav-prequiz" onclick="showPage('prequiz')">แบบทดสอบ (ก่อนเรียน)</a>
+        <a href="javascript:void(0)" id="nav-knowledge" onclick="showPage('knowledge')">ความรู้</a>
+        <a href="javascript:void(0)" id="nav-postquiz" onclick="showPage('postquiz')">แบบทดสอบ (หลังเรียน)</a>
+        <a href="javascript:void(0)" id="nav-about" onclick="showPage('about')">เกี่ยวกับเรา</a>
+    </nav>
+    <div class="container">
+
+        <!-- หน้าแรก -->
+        <section class="content page-section active" id="page-home">
+            <h2>ยินดีต้อนรับ</h2>
+            <p>
+                เว็บไซต์นี้จัดทำขึ้นเพื่อเผยแพร่ความรู้
+                และนำเสนอข้อมูลที่เป็นประโยชน์
+                เพื่อให้ผู้เข้าชมสามารถเรียนรู้สิ่งใหม่ ๆ เกี่ยวกับ AI
+            </p>
+
+            <div class="steps">
+                <div class="step"><b>ขั้นที่ 1</b>วัดความรู้พื้นฐานของคุณก่อน<br><button class="action-btn" onclick="showPage('prequiz')">ทำแบบทดสอบก่อนเรียน</button></div>
+                <div class="step"><b>ขั้นที่ 2</b>อ่านความรู้เรื่อง AI แบบเข้าใจง่าย<br><button class="action-btn" onclick="showPage('knowledge')">ไปอ่านความรู้</button></div>
+                <div class="step"><b>ขั้นที่ 3</b>ทดสอบอีกครั้งและดูว่าคะแนนเพิ่มขึ้นเท่าไร<br><button class="action-btn" onclick="showPage('postquiz')">ทำแบบทดสอบหลังเรียน</button></div>
+            </div>
+
+            <hr class="divider">
+            <h3 class="center-title">🗺️ แผนผังความคิด (Mind Map) ตัวอย่างการใช้งาน AI ในชีวิตประจำวัน</h3>
+            <div class="mindmap">
+                <div class="mindmap-root">🤖 AI (Artificial Intelligence) ปัญญาประดิษฐ์</div>
+                <div class="mindmap-arrow">⬇️ แตกแขนง 5 ด้านการใช้งานหลัก ⬇️</div>
+                <div class="mindmap-branches">
+                    <div class="branch"><div class="icon">🎧</div><strong>1. แอปเพลง</strong><small>เลือกเพลงโปรดตามพฤติกรรม</small></div>
+                    <div class="branch"><div class="icon">🗣️</div><strong>2. ผู้ช่วยเสียง</strong><small>ตอบคำถามในสมาร์ทโฟน</small></div>
+                    <div class="branch"><div class="icon">🚗</div><strong>3. รถไร้คนขับ</strong><small>Self-driving technology</small></div>
+                    <div class="branch"><div class="icon">🎮</div><strong>4. ตัวละครเกม</strong><small>พฤติกรรมอัจฉริยะ (NPC)</small></div>
+                    <div class="branch"><div class="icon">💻</div><strong>5. เขียนโปรแกรม</strong><small>AI Coding Assistant</small></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- หน้าแบบทดสอบ (ก่อนเรียน) -->
+        <section class="content page-section" id="page-prequiz">
+            <h2>แบบทดสอบ (ก่อนเรียน) (25 ข้อ)</h2>
+            <p class="lead">วัดความรู้พื้นฐานก่อนอ่านเนื้อหา รอบนี้ระบบจะ<strong>ยังไม่เฉลย</strong> ไม่ต้องกังวลหากตอบไม่ได้ เดาจากสิ่งที่รู้ได้เลย แล้วไปอ่านหน้า "ความรู้" จากนั้นกลับมาทำแบบทดสอบหลังเรียนเพื่อเทียบคะแนน</p>
+            <div id="pre-quiz-area">
+                <div class="quiz-status">
+                    <span id="pre-question-number">ข้อที่ 1 / 25</span>
+                    <span id="pre-score-text"></span>
+                </div>
+                <div class="progress"><div id="pre-progress"></div></div>
+                <span class="cat-tag" id="pre-cat"></span>
+                <h3 id="pre-question-title">กำลังโหลดคำถาม...</h3>
+                <div id="pre-options-list"></div>
+                <div id="pre-explanation-box" class="explanation-box"></div>
+                <button id="pre-next-btn" class="action-btn" style="display: none;" onclick="nextQuestion('pre')">ข้อถัดไป</button>
+            </div>
+            <div id="pre-result-area" class="result-area">
+                <h3 class="center">สรุปผลแบบทดสอบก่อนเรียน</h3>
+                <p class="result-score" id="pre-final-score"></p>
+                <p class="result-level" id="pre-result-level"></p>
+                <p class="result-message" id="pre-result-message"></p>
+                <div class="result-box"><h4>คะแนนแยกตามหมวด</h4><div id="pre-breakdown"></div></div>
+                <div class="result-box"><h4>ประวัติผลของคุณ</h4><div id="pre-history"></div></div>
+                <div class="result-actions">
+                    <button class="action-btn" onclick="showPage('knowledge')">ไปอ่านความรู้</button>
+                    <button class="action-btn secondary" onclick="restartQuiz('pre')">ทำก่อนเรียนอีกครั้ง</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- หน้าความรู้ -->
+        <section class="content page-section" id="page-knowledge">
+            <h2>หมวดหมู่ความรู้: AI แบบเข้าใจง่ายใน 1 นาที</h2>
+            <h3>1. AI คืออะไรกันแน่?</h3>
+            <p>
+                <strong>AI (Artificial Intelligence) หรือ ปัญญาประดิษฐ์</strong> คือ เทคโนโลยีที่ทำให้คอมพิวเตอร์หรือเครื่องจักรสามารถ <strong>"คิด"</strong> และ <strong>"ทำงาน"</strong> ได้คล้ายกับมนุษย์ เช่น การพูดคุย การจำภาพ การเล่นเกม หรือการช่วยตอบคำถามต่างๆ
+            </p>
+            <ul>
+                <li><strong>AI เรียนรู้จาก "ข้อมูล":</strong> AI ไม่ได้ฉลาดเองตั้งแต่แรก แต่เกิดจากการฝึกฝนผ่านข้อมูล</li>
+                <li><strong>Big Data:</strong> AI ต้องการข้อมูลจำนวนมหาศาล (Big Data) เพื่อฝึกฝน ยิ่งข้อมูลเยอะ ยิ่งฉลาด!</li>
+            </ul>
+            <h3>2. ตัวอย่างการใช้งาน AI ในชีวิตประจำวันทั้ง 5 ด้าน </h3>
+            <p>ในชีวิตประจำวันของเรา เทคโนโลยี AI อยู่ใกล้ตัวมากกว่าที่เราคิด และช่วยอำนวยความสะดวกในด้านต่างๆ ถึง 5 ด้านหลัก ดังนี้ครับ:</p>
+
+            <div class="topic-card">
+                <h4>1. แอปเพลงที่เลือกเพลงโปรดมาให้เราฟัง (Music Streaming AI)</h4>
+                <p><strong>เนื้อหา:</strong> สมเวลาที่เราเปิดแอปฟังเพลง ทำไมแอปถึงรู้ว่าเราชอบฟังเพลงแนวไหน? นั่นเพราะระบบ AI คอยจดจำพฤติกรรมของเรา เช่น เพลงไหนที่เรากดฟังจนจบ เพลงไหนที่เรากดข้าม หรือแนวเพลงที่เรากดถูกใจ AI จะนำข้อมูลเหล่านี้ไปประมวลผลและเลือกสรรเพลงใหม่ๆ ที่ตรงกับรสนิยมของเรามาจัดเป็นเพลย์ลิสต์แนะนำโดยที่เราไม่ต้องเสียเวลาค้นหาเองเลย</p>
+            </div>
+            <div class="topic-card">
+                <h4>2. ผู้ช่วยเสียงในสมาร์ทโฟนที่ตอบคำถามได้ (Voice Assistant)</h4>
+                <p><strong>เนื้อหา:</strong> เคยพูดคุยหรือสั่งงานสมาร์ทโฟนผ่านเสียงไหมครับ? เช่น การเรียก Siri หรือ Google Assistant เบื้องหลังการทำงานคือ AI ที่มีความสามารถในการฟังเสียงพูดของมนุษย์ (Speech-to-Text) แปลงเสียงเป็นข้อมูล วิเคราะห์ความหมาย และประมวลผลคำตอบออกมาเป็นเสียงพูดตอบกลับเราได้อย่างเป็นธรรมชาติเสมือนมีเพื่อนคอยช่วยเหลืออยู่ข้างๆ</p>
+            </div>
+            <div class="topic-card">
+                <h4>3. รถยนต์ที่ขับได้เองด้วย Self-driving technology</h4>
+                <p><strong>เนื้อหา:</strong> รถยนต์ไร้คนขับเปรียบเสมือนหุ่นยนต์ติดล้อที่ใช้ AI ทำหน้าที่แทนสมองของคนขับรถ โดยตัวรถจะติดตั้งกล้อง เซนเซอร์ และเรดาร์รอบคันเพื่อมองหาถนน เลนจราจร ป้ายสัญญาณ และสิ่งกีดขวางแบบเรียลไทม์ จากนั้น AI จะคำนวณและตัดสินใจบังคับพวงมาลัย เหยียบเบรก หรือเร่งความเร็วได้อย่างปลอดภัยโดยไม่ต้องพึ่งพามนุษย์</p>
+            </div>
+            <div class="topic-card">
+                <h4>4. ตัวละครในเกมที่มีพฤติกรรมอัจฉริยะ (Game AI / NPC)</h4>
+                <p><strong>เนื้อหา:</strong> เวลาเราเล่นเกมแล้วเจอตัวละครฝ่ายตรงข้าม (ที่ไม่ได้บังคับโดยคนจริง) แต่กลับมีความฉลาด รู้จักหลบกระสุน หาที่กำบัง หรือวางแผนโอบล้อมเรา ตัวละครเหล่านั้นถูกควบคุมด้วย Game AI ที่คอยคิดวิเคราะห์และปรับเปลี่ยนกลยุทธ์ตามการกระทำของผู้เล่น ทำให้การเล่นเกมมีความท้าทาย สนุกสนาน และมีความสมจริงมากยิ่งขึ้น</p>
+            </div>
+            <div class="topic-card">
+                <h4>5. การเขียนโปรแกรม (AI Coding Assistant)</h4>
+                <p><strong>เนื้อหา:</strong> สำหรับคนที่ศึกษาหรือทำงานด้านการเขียนโปรแกรม (Coding) ปัจจุบันมี AI คอยทำหน้าที่เป็นผู้ช่วยอัจฉริยะ ช่วยแนะนำคำสั่ง เขียนโครงสร้างโค้ดเบื้องต้น และช่วยตรวจสอบหาจุดที่ผิดพลาด (Bug) ในโปรแกรมได้อย่างรวดเร็ว ช่วยประหยัดเวลาและช่วยให้ผู้เริ่มต้นเรียนรู้การเขียนโค้ดได้เข้าใจง่ายยิ่งขึ้น</p>
+            </div>
+            <hr class="divider">
+            <h3>3. สรุปเนื้อหา</h3>
+            <p><strong>ภาพรวมองค์ความรู้เรื่อง AI (Artificial Intelligence):</strong></p>
+            <ul>
+                <li><strong>นิยามหลัก:</strong> AI คือเทคโนโลยีที่ทำให้คอมพิวเตอร์และเครื่องจักรมีความสามารถในการคิด วิเคราะห์ เรียนรู้ และตัดสินใจได้ใกล้เคียงกับสมองมนุษย์</li>
+                <li><strong>หัวใจสำคัญ:</strong> AI ขับเคลื่อนด้วย <strong>Big Data</strong> ยิ่งป้อนข้อมูลให้เรียนรู้มากเท่าไร ระบบก็จะยิ่งมีความฉลาด แม่นยำ และเข้าใจบริบทต่างๆ ได้ดียิ่งขึ้น</li>
+                <li><strong>การประยุกต์ใช้งานในชีวิตประจำวัน (5 ด้านหลัก):</strong>
+                    <ul>
+                        <li><em>แอปเพลง:</em> แนะนำและคัดสรรเพลงโปรดตามพฤติกรรมความชอบของผู้ใช้</li>
+                        <li><em>ผู้ช่วยเสียง (Voice Assistant):</em> โต้ตอบ ฟังเสียงพูด และช่วยอำนวยความสะดวกในสมาร์ทโฟน</li>
+                        <li><em>รถยนต์ขับเคลื่อนอัตโนมัติ:</em> ใช้กล้องและเซนเซอร์ร่วมกับ AI เพื่อประมวลผลการขับขี่อย่างปลอดภัย</li>
+                        <li><em>ตัวละครในเกม (NPC):</em> สร้างความท้าทายด้วยพฤติกรรมอัจฉริยะและการตัดสินใจที่สมจริง</li>
+                        <li><em>การเขียนโปรแกรม (Coding):</em> เป็นผู้ช่วยแนะนำโค้ด ตรวจสอบข้อผิดพลาด และช่วยพัฒนาซอฟต์แวร์</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="cta">
+                <button class="action-btn" onclick="showPage('postquiz')">ทำแบบทดสอบ (หลังเรียน)</button>
+            </div>
+        </section>
+
+        <!-- หน้าแบบทดสอบ (หลังเรียน) -->
+        <section class="content page-section" id="page-postquiz">
+            <h2>แบบทดสอบ (หลังเรียน) (25 ข้อ)</h2>
+            <p class="lead">ทบทวนความเข้าใจหลังจากศึกษาเนื้อหา AI แบบเข้าใจง่าย และตัวอย่างการใช้งานจริงทั้ง 5 ด้าน รอบนี้มีเฉลยและคำอธิบายทุกข้อ</p>
+            <div id="post-quiz-area">
+                <div class="quiz-status">
+                    <span id="post-question-number">ข้อที่ 1 / 25</span>
+                    <span id="post-score-text">คะแนน: 0</span>
+                </div>
+                <div class="progress"><div id="post-progress"></div></div>
+                <span class="cat-tag" id="post-cat"></span>
+                <h3 id="post-question-title">กำลังโหลดคำถาม...</h3>
+                <div id="post-options-list"></div>
+                <div id="post-explanation-box" class="explanation-box"></div>
+                <button id="post-next-btn" class="action-btn" style="display: none;" onclick="nextQuestion('post')">ข้อถัดไป</button>
+            </div>
+            <div id="post-result-area" class="result-area">
+                <h3 class="center">สรุปผลแบบทดสอบหลังเรียน</h3>
+                <p class="result-score" id="post-final-score"></p>
+                <p class="result-level" id="post-result-level"></p>
+                <p class="result-message" id="post-result-message"></p>
+                <div class="result-box"><h4>เปรียบเทียบก่อนเรียน - หลังเรียน</h4><div id="post-compare"></div></div>
+                <div class="result-box"><h4>คะแนนแยกตามหมวด</h4><div id="post-breakdown"></div></div>
+                <div class="result-box"><h4 id="post-review-title">ข้อที่ตอบผิด</h4><div id="post-review"></div></div>
+                <div class="result-box"><h4>ประวัติผลของคุณ</h4><div id="post-history"></div></div>
+                <div class="result-actions">
+                    <button class="action-btn" onclick="restartQuiz('post')">ทำแบบทดสอบ (หลังเรียน) อีกครั้ง</button>
+                    <button class="action-btn secondary" onclick="showPage('knowledge')">กลับไปทบทวนเนื้อหา</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- หน้าเกี่ยวกับเรา -->
+        <section class="content page-section" id="page-about">
+            <h2>เกี่ยวกับเรา</h2>
+            <p>
+                เว็บไซต์นี้เป็นสื่อการเรียนรู้
+                ที่รวบรวมข้อมูลความรู้ทั่วไป
+                เพื่อส่งเสริมการศึกษาและการเรียนรู้
+                เราอยากให้ทุกคนได้รู้ว่า AI มันอยู่ใกล้ตัวเรากว่าที่คิด
+                เราใช้งาน AI มาก่อนที่จะมี Gemini และ ChatGPT ด้วยซ้ำ
+            </p>
+
+            <h3>ผู้จัดทำ</h3>
+            <p>
+                โครงงานของนักศึกษาระดับ ปวส. 2 ห้อง/สช. 241
+            </p>
+
+            <h3>แหล่งอ้างอิง</h3>
+            <p>
+                เนื้อหาและข้อสอบทั้ง 25 ข้อในแบบทดสอบก่อนเรียนและหลังเรียน
+                จัดทำขึ้นจากความรู้ในหน้า "ความรู้" ของเว็บไซต์นี้ทั้งหมด
+            </p>
+        </section>
+    </div>
+    <footer>
+        <p>© 2026 YOU Know AI · สื่อการเรียนรู้เรื่องปัญญาประดิษฐ์ (AI)</p>
+    </footer>
+
+    <script>
+        // ---------- สลับหน้า ----------
+        function showPage(pageName) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById('page-' + pageName).classList.add('active');
+            document.getElementById('nav-' + pageName).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // ---------- คลังข้อสอบ 25 ข้อ (ใช้ชุดเดียวกันทั้งก่อนเรียนและหลังเรียน เพื่อเทียบคะแนนได้ตรงกัน) ----------
+        // cat: basic = ความหมายของ AI, data = AI กับข้อมูล, apply = การใช้งาน 5 ด้าน
+        const CATEGORIES = {
+            basic: 'ความหมายของ AI',
+            data: 'AI กับข้อมูล (Big Data)',
+            apply: 'การใช้งาน AI ทั้ง 5 ด้าน'
+        };
+        // ตัวเลือกที่ขึ้นต้นด้วยคำเหล่านี้จะถูกวางท้ายสุดเสมอ ไม่ถูกสุ่ม
+        const PINNED_LAST = /^(ถูกทุกข้อ|ไม่มีข้อใดถูก|ถูกทั้งสองข้อ)/;
+
+        const questions = [
+            // ----- หมวด 1: ความหมายของ AI (6 ข้อ) -----
+            {
+                cat: 'basic',
+                q: "ปัญญาประดิษฐ์ที่เรียกย่อว่า AI มาจากคำภาษาอังกฤษข้อใด?",
+                options: ["Artificial Intelligence", "Automated Information", "Advanced Interactive Assistant", "Applied Internet Application"],
+                answer: 0,
+                explain: "AI ย่อมาจาก Artificial Intelligence แปลว่า ปัญญาประดิษฐ์"
+            },
+            {
+                cat: 'basic',
+                q: "ตามเนื้อหา คำว่า \"คิด\" และ \"ทำงาน\" ของ AI หมายถึงข้อใด?",
+                options: ["เครื่องจักรทำงานเลียนแบบมนุษย์ เช่น พูดคุย จำภาพ ตอบคำถาม", "เครื่องจักรมีความรู้สึกและอารมณ์เหมือนมนุษย์ทุกประการจนแยกไม่ออก", "คอมพิวเตอร์ทำตามคำสั่งตายตัวทุกครั้งโดยไม่ปรับตัวใดๆ เลยแม้แต่น้อย", "มนุษย์ต้องสั่งทุกขั้นตอนตลอดเวลาที่เครื่องกำลังทำงานอยู่"],
+                answer: 0,
+                explain: "AI ทำให้คอมพิวเตอร์หรือเครื่องจักร \"คิด\" และ \"ทำงาน\" ได้คล้ายกับมนุษย์ เช่น การพูดคุย การจำภาพ การเล่นเกม หรือการช่วยตอบคำถาม"
+            },
+            {
+                cat: 'basic',
+                q: "ข้อใดเป็นความสามารถของ AI ที่เนื้อหายกเป็นตัวอย่าง?",
+                options: ["การพูดคุยกับผู้ใช้", "การจำภาพ", "การช่วยตอบคำถามต่างๆ", "ถูกทุกข้อ"],
+                answer: 3,
+                explain: "เนื้อหายกตัวอย่างความสามารถของ AI ไว้ทั้ง การพูดคุย การจำภาพ การเล่นเกม และการช่วยตอบคำถาม จึงถูกทุกข้อ"
+            },
+            {
+                cat: 'basic',
+                q: "ในสรุปเนื้อหา ข้อใดไม่ใช่ความสามารถที่ AI ทำได้ใกล้เคียงสมองมนุษย์?",
+                options: ["รู้สึกเหนื่อยล้าและต้องพักผ่อนเหมือนคน", "วิเคราะห์ข้อมูลที่ได้รับเข้ามาในแต่ละสถานการณ์", "เรียนรู้จากข้อมูลจำนวนมากที่ใช้ในการฝึกฝน", "ตัดสินใจเลือกสิ่งที่เหมาะสมในสถานการณ์นั้น"],
+                answer: 0,
+                explain: "สรุปเนื้อหาระบุว่า AI คิด วิเคราะห์ เรียนรู้ และตัดสินใจได้ใกล้เคียงสมองมนุษย์ ไม่ได้กล่าวถึงความเหนื่อยล้าหรือการต้องพักผ่อน"
+            },
+            {
+                cat: 'basic',
+                q: "เนื้อหาแบ่งการใช้งาน AI ในชีวิตประจำวันเป็น 5 ด้านหลัก ชุดใดตรงกับเนื้อหา?",
+                options: ["แอปเพลง ผู้ช่วยเสียง รถยนต์ไร้คนขับ ตัวละครในเกม การเขียนโปรแกรม", "แอปเพลง แอปธนาคาร รถยนต์ไร้คนขับ ตัวละครในเกม การตัดต่อวิดีโอ", "ผู้ช่วยเสียง การแพทย์ รถยนต์ไร้คนขับ แอปซื้อของ การเขียนโปรแกรม", "แอปเพลง ผู้ช่วยเสียง เครื่องซักผ้า ตัวละครในเกม การเขียนโปรแกรม"],
+                answer: 0,
+                explain: "5 ด้านหลักคือ แอปเพลง ผู้ช่วยเสียง รถยนต์ขับเคลื่อนอัตโนมัติ ตัวละครในเกม (NPC) และการเขียนโปรแกรม"
+            },
+            {
+                cat: 'basic',
+                q: "ข้อความ \"AI ไม่ได้ฉลาดเองตั้งแต่แรก\" มีความหมายตรงกับข้อใด?",
+                options: ["AI ต้องผ่านการฝึกฝนด้วยข้อมูลก่อนจึงจะทำงานได้ดี", "AI ถูกสร้างมาให้รู้ทุกอย่างตั้งแต่เปิดใช้งานครั้งแรก", "AI จะฉลาดขึ้นเองได้แม้ไม่มีข้อมูลใดๆ ให้เรียนรู้", "AI ฉลาดขึ้นได้ด้วยการปิดเครื่องแล้วเปิดใหม่หลายรอบ"],
+                answer: 0,
+                explain: "AI ไม่ได้ฉลาดเองตั้งแต่แรก แต่เกิดจากการฝึกฝนผ่านข้อมูล"
+            },
+
+            // ----- หมวด 2: AI กับข้อมูล (6 ข้อ) -----
+            {
+                cat: 'data',
+                q: "Big Data ในเนื้อหาหมายถึงอะไร?",
+                options: ["ข้อมูลจำนวนมหาศาลที่ใช้ฝึกฝนให้ AI เรียนรู้", "ฮาร์ดดิสก์ขนาดใหญ่ที่ใช้เก็บไฟล์ในคอมพิวเตอร์", "โปรแกรมสำหรับตกแต่งภาพถ่ายให้มีขนาดใหญ่ขึ้น", "สัญญาณอินเทอร์เน็ตความเร็วสูงที่ใช้ดาวน์โหลดไฟล์"],
+                answer: 0,
+                explain: "Big Data คือข้อมูลจำนวนมหาศาลที่ AI ต้องใช้ในการฝึกฝน"
+            },
+            {
+                cat: 'data',
+                q: "เมื่อป้อนข้อมูลให้ AI เรียนรู้ได้มากขึ้น ผลที่ตามมาตามเนื้อหาคือข้อใด?",
+                options: ["ระบบฉลาด แม่นยำ และเข้าใจบริบทได้ดีขึ้น", "ระบบทำงานช้าลงและตอบคำถามได้น้อยลง", "ระบบหยุดเรียนรู้เพราะข้อมูลมากเกินไป", "ระบบเปลี่ยนไปทำงานด้านอื่นโดยอัตโนมัติ"],
+                answer: 0,
+                explain: "ยิ่งป้อนข้อมูลให้เรียนรู้มากเท่าไร ระบบก็จะยิ่งฉลาด แม่นยำ และเข้าใจบริบทต่างๆ ได้ดียิ่งขึ้น"
+            },
+            {
+                cat: 'data',
+                q: "ทีม ก. ฝึก AI ด้วยข้อมูล 100 รายการ ทีม ข. ฝึก AI ตัวเดียวกันด้วยข้อมูล 1,000,000 รายการ ตามหลักในเนื้อหา ข้อใดน่าจะเป็นจริง?",
+                options: ["AI ของทีม ข. มีแนวโน้มแม่นยำกว่า", "AI ของทีม ก. มีแนวโน้มแม่นยำกว่า", "AI ของทั้งสองทีมแม่นยำเท่ากันเสมอ", "จำนวนข้อมูลไม่มีผลต่อความแม่นยำเลย"],
+                answer: 0,
+                explain: "เนื้อหาระบุว่ายิ่งข้อมูลเยอะ AI ยิ่งฉลาดและแม่นยำ ทีมที่ใช้ข้อมูลมากกว่าจึงมีแนวโน้มได้ AI ที่แม่นกว่า"
+            },
+            {
+                cat: 'data',
+                q: "ตามสรุปเนื้อหา สิ่งใดคือ \"หัวใจสำคัญ\" ที่ขับเคลื่อน AI?",
+                options: ["Big Data", "ความเร็วของเครื่องพิมพ์", "ขนาดของหน้าจอ", "ความสวยงามของโปรแกรม"],
+                answer: 0,
+                explain: "สรุปเนื้อหาระบุว่าหัวใจสำคัญคือ AI ขับเคลื่อนด้วย Big Data"
+            },
+            {
+                cat: 'data',
+                q: "ข้อใดเป็นตัวอย่าง \"ข้อมูล\" ที่ AI ของแอปเพลงนำไปเรียนรู้ตามเนื้อหา?",
+                options: ["การกดข้ามเพลงและการกดถูกใจเพลงของผู้ใช้ในแอปเพลง", "สีของหน้าจอโทรศัพท์และธีมที่ผู้ใช้ตั้งไว้ในเครื่อง", "จำนวนแอปทั้งหมดที่ผู้ใช้ติดตั้งไว้ในโทรศัพท์", "ยี่ห้อของหูฟังที่ผู้ใช้เคยซื้อมาใช้งานก่อนหน้านี้"],
+                answer: 0,
+                explain: "AI แอปเพลงเรียนรู้จากพฤติกรรมผู้ใช้ เช่น เพลงที่กดฟังจนจบ เพลงที่กดข้าม และแนวเพลงที่กดถูกใจ"
+            },
+            {
+                cat: 'data',
+                q: "ถ้าระบบ AI ไม่มีข้อมูลให้ฝึกฝนเลย ตามหลักในเนื้อหา จะเกิดอะไรขึ้น?",
+                options: ["ระบบเรียนรู้ไม่ได้ จึงยังทำงานได้ไม่ดี", "ระบบเรียนรู้ได้เร็วกว่าเดิมหลายเท่า", "ระบบฉลาดขึ้นได้เองโดยไม่ต้องฝึก", "ระบบกลายเป็นมนุษย์ที่คิดเองได้ทุกอย่าง"],
+                answer: 0,
+                explain: "AI ฉลาดขึ้นจากการฝึกฝนผ่านข้อมูล หากไม่มีข้อมูล AI ก็ไม่มีสิ่งให้เรียนรู้"
+            },
+
+            // ----- หมวด 3: การใช้งาน AI ทั้ง 5 ด้าน (13 ข้อ) -----
+            // แอปเพลง
+            {
+                cat: 'apply',
+                q: "ผู้ใช้กดฟังเพลงหนึ่งจนจบทุกครั้ง AI ของแอปเพลงจะนำข้อมูลนี้ไปทำอะไร?",
+                options: ["เลือกเพลงที่ตรงกับรสนิยมของผู้ใช้มาแนะนำเพิ่มเติม", "ลบเพลงนั้นออกจากแอปทันทีเพราะถือว่าฟังซ้ำเกินไป", "ปิดการแนะนำเพลงทั้งหมดของผู้ใช้คนนั้นไว้ก่อน", "เปลี่ยนภาษาของแอปเป็นภาษาอื่นโดยอัตโนมัติ"],
+                answer: 0,
+                explain: "AI จดจำพฤติกรรม เช่น เพลงที่กดฟังจนจบ แล้วนำไปประมวลผลเพื่อเลือกเพลงใหม่ที่ตรงกับรสนิยม"
+            },
+            {
+                cat: 'apply',
+                q: "ผู้ใช้กดข้ามเพลงแนวหนึ่งบ่อยๆ ข้อใดคือผลที่สมเหตุสมผลที่สุดตามหลักของเนื้อหา?",
+                options: ["AI นำพฤติกรรมนี้ไปปรับการเลือกเพลงในเพลย์ลิสต์แนะนำ", "AI ไม่สนใจพฤติกรรมการกดข้ามของผู้ใช้เลยแม้แต่ครั้งเดียว", "AI บังคับให้ผู้ใช้ต้องฟังเพลงแนวนั้นจนจบทุกครั้ง", "AI ส่งเพลงแนวนั้นมาให้มากขึ้นเรื่อยๆ ทุกวันโดยไม่หยุด"],
+                answer: 0,
+                explain: "เนื้อหาระบุว่า AI จดจำทั้งเพลงที่กดฟังจนจบและเพลงที่กดข้าม แล้วนำข้อมูลไปประมวลผลเพื่อเลือกเพลงให้ตรงรสนิยมมากขึ้น"
+            },
+            {
+                cat: 'apply',
+                q: "ประโยชน์หลักที่ผู้ใช้ได้รับจาก AI ในแอปเพลงตามเนื้อหาคือข้อใด?",
+                options: ["ได้เพลย์ลิสต์แนะนำโดยไม่ต้องเสียเวลาค้นหาเอง", "ได้ฟังเพลงทุกเพลงฟรีโดยไม่มีโฆษณามาคั่นเลย", "ได้แต่งเพลงเองโดยไม่ต้องมีความรู้ดนตรีมาก่อน", "ได้ลำโพงที่เสียงดังขึ้นกว่าเดิมหลายเท่าตัว"],
+                answer: 0,
+                explain: "AI เลือกเพลงที่ตรงกับรสนิยมมาจัดเป็นเพลย์ลิสต์แนะนำ โดยผู้ใช้ไม่ต้องเสียเวลาค้นหาเอง"
+            },
+            // ผู้ช่วยเสียง
+            {
+                cat: 'apply',
+                q: "ความสามารถ Speech-to-Text ของผู้ช่วยเสียงทำหน้าที่อะไร?",
+                options: ["ฟังเสียงพูดของมนุษย์แล้วแปลงเป็นข้อมูลให้ AI ประมวลผลต่อ", "อ่านตัวหนังสือบนหน้าจอออกเสียงให้ผู้ใช้ฟังเท่านั้น", "แปลภาษาไทยเป็นภาษาอังกฤษให้ผู้ใช้อ่านเท่านั้น", "บันทึกวิดีโอหน้าจอของสมาร์ทโฟนไว้ดูย้อนหลัง"],
+                answer: 0,
+                explain: "Speech-to-Text คือความสามารถในการฟังเสียงพูดของมนุษย์และแปลงเป็นข้อมูล เพื่อให้ AI นำไปวิเคราะห์ความหมายต่อ"
+            },
+            {
+                cat: 'apply',
+                q: "เมื่อสั่งงานผู้ช่วยเสียงด้วยเสียง ลำดับการทำงานของ AI ตามเนื้อหาคือข้อใด?",
+                options: ["ฟังเสียง แปลงเป็นข้อมูล วิเคราะห์ความหมาย ตอบเป็นเสียงพูด", "วิเคราะห์ความหมาย ตอบเป็นเสียงพูด ฟังเสียง แปลงเป็นข้อมูล", "ตอบเป็นเสียงพูด ฟังเสียง วิเคราะห์ความหมาย แปลงเป็นข้อมูล", "แปลงเป็นข้อมูล ตอบเป็นเสียงพูด ฟังเสียง วิเคราะห์ความหมาย"],
+                answer: 0,
+                explain: "AI ฟังเสียงพูด แปลงเสียงเป็นข้อมูล วิเคราะห์ความหมาย แล้วประมวลผลคำตอบออกมาเป็นเสียงพูดตอบกลับ"
+            },
+            {
+                cat: 'apply',
+                q: "เนื้อหายกตัวอย่างผู้ช่วยเสียงในสมาร์ทโฟนข้อใด?",
+                options: ["Siri และ Google Assistant", "Netflix และ YouTube Premium", "Microsoft Excel และ Word", "Facebook และ Instagram Reels"],
+                answer: 0,
+                explain: "เนื้อหายกตัวอย่างการเรียก Siri หรือ Google Assistant เป็นผู้ช่วยเสียงที่ใช้ AI"
+            },
+            // รถไร้คนขับ
+            {
+                cat: 'apply',
+                q: "รถยนต์ไร้คนขับติดตั้งอุปกรณ์ใดรอบคันเพื่อมองหาถนน เลนจราจร และสิ่งกีดขวาง?",
+                options: ["กล้อง เซนเซอร์ และเรดาร์", "ไมโครโฟนและลำโพง", "เครื่องพิมพ์และสแกนเนอร์", "แบตเตอรี่สำรองและสายชาร์จ"],
+                answer: 0,
+                explain: "ตัวรถติดตั้งกล้อง เซนเซอร์ และเรดาร์รอบคัน เพื่อมองหาถนน เลนจราจร ป้ายสัญญาณ และสิ่งกีดขวางแบบเรียลไทม์"
+            },
+            {
+                cat: 'apply',
+                q: "เนื้อหาเปรียบ AI ในรถยนต์ไร้คนขับว่าทำหน้าที่แทนส่วนใดของคนขับรถ?",
+                options: ["สมองของคนขับ", "มือที่จับพวงมาลัยเท่านั้น", "ดวงตาของคนขับเท่านั้น", "ที่นั่งของคนขับ"],
+                answer: 0,
+                explain: "รถยนต์ไร้คนขับเปรียบเสมือนหุ่นยนต์ติดล้อที่ใช้ AI ทำหน้าที่แทนสมองของคนขับรถ"
+            },
+            {
+                cat: 'apply',
+                q: "เมื่อกล้องและเซนเซอร์ของรถไร้คนขับพบสิ่งกีดขวางข้างหน้า AI จะทำอะไรต่อ?",
+                options: ["คำนวณและตัดสินใจบังคับพวงมาลัยหรือเหยียบเบรก", "ส่งข้อความขอให้ผู้โดยสารลงมาช่วยขับรถเองทุกครั้ง", "หยุดคิดและรอจนกว่าสิ่งกีดขวางจะหายไปเอง", "ปิดกล้องและเซนเซอร์เพื่อประหยัดพลังงานของรถ"],
+                answer: 0,
+                explain: "AI จะคำนวณและตัดสินใจบังคับพวงมาลัย เหยียบเบรก หรือเร่งความเร็วได้อย่างปลอดภัยโดยไม่ต้องพึ่งพามนุษย์"
+            },
+            // ตัวละครเกม
+            {
+                cat: 'apply',
+                q: "ตัวละครฝ่ายตรงข้ามในเกมที่หลบกระสุนและหาที่กำบังได้ ถูกควบคุมโดยอะไร?",
+                options: ["Game AI ที่คิดวิเคราะห์เอง ไม่ใช่ผู้เล่นคนจริง", "ผู้เล่นคนจริงที่แอบเข้ามาเล่นอยู่ในเกมเดียวกันนั้น", "ผู้พัฒนาเกมที่นั่งควบคุมตัวละครทีละตัวด้วยตนเอง", "ตัวละครของผู้เล่นเองที่ถูกสลับไปอยู่อีกฝ่ายหนึ่ง"],
+                answer: 0,
+                explain: "เนื้อหาระบุว่าตัวละครฝ่ายตรงข้ามที่ไม่ได้บังคับโดยคนจริงถูกควบคุมด้วย Game AI"
+            },
+            {
+                cat: 'apply',
+                q: "ผู้เล่นเปลี่ยนวิธีเล่นกลางเกม Game AI ที่ดีตามเนื้อหาควรทำอย่างไร?",
+                options: ["ปรับเปลี่ยนกลยุทธ์ตามการกระทำของผู้เล่น", "ใช้กลยุทธ์เดิมซ้ำๆ ทุกครั้งโดยไม่เปลี่ยน", "หยุดเกมทันทีจนกว่าผู้เล่นจะกลับมาเล่นแบบเดิม", "ให้ผู้เล่นชนะทุกครั้งเพื่อความสนุก"],
+                answer: 0,
+                explain: "Game AI คอยคิดวิเคราะห์และปรับเปลี่ยนกลยุทธ์ตามการกระทำของผู้เล่น ทำให้เกมท้าทายและสมจริงยิ่งขึ้น"
+            },
+            // เขียนโปรแกรม
+            {
+                cat: 'apply',
+                q: "AI Coding Assistant ช่วยผู้เริ่มต้นเรียนเขียนโปรแกรมได้อย่างไรตามเนื้อหา?",
+                options: ["แนะนำคำสั่ง ช่วยหาจุดผิดพลาด (Bug) และทำให้เรียนรู้ง่ายขึ้น", "เรียนแทนผู้เริ่มต้นทั้งหมดจนผู้เรียนไม่ต้องทำอะไรเลย", "ซ่อนข้อผิดพลาดของโปรแกรมไม่ให้ผู้ใช้เห็นอีกต่อไป", "เปลี่ยนภาษาโปรแกรมทั้งหมดให้เป็นภาษาไทยอัตโนมัติ"],
+                answer: 0,
+                explain: "AI Coding Assistant ช่วยแนะนำคำสั่ง เขียนโครงสร้างโค้ดเบื้องต้น และตรวจหาจุดผิดพลาด ช่วยประหยัดเวลาและทำให้ผู้เริ่มต้นเข้าใจง่ายขึ้น"
+            },
+            {
+                cat: 'apply',
+                q: "ข้อใดไม่ใช่สิ่งที่เนื้อหากล่าวว่า AI Coding Assistant ช่วยทำได้?",
+                options: ["รับประกันว่าโปรแกรมที่เขียนจะไม่มีวันผิดพลาดอีก", "แนะนำคำสั่งที่เหมาะสมในการเขียนโปรแกรม", "เขียนโครงสร้างโค้ดเบื้องต้นให้ผู้เริ่มต้น", "ตรวจสอบหาจุดที่ผิดพลาดในโปรแกรมได้รวดเร็ว"],
+                answer: 0,
+                explain: "เนื้อหากล่าวว่า AI ช่วยแนะนำคำสั่ง เขียนโครงสร้างโค้ดเบื้องต้น และตรวจหา Bug แต่ไม่ได้รับประกันว่าโปรแกรมจะไม่ผิดพลาด"
+            }
+        ];
+
+        // ---------- สถานะของแบบทดสอบแต่ละโหมด ----------
+        // pre = ก่อนเรียน (ไม่เฉลยระหว่างทำ), post = หลังเรียน (เฉลยทันที + สรุปข้อที่ผิด)
+        const quizState = {
+            pre:  { prefix: 'pre-',  feedback: false, label: 'ก่อนเรียน' },
+            post: { prefix: 'post-', feedback: true,  label: 'หลังเรียน' }
+        };
+        // ---------- เก็บผลถาวรในเบราว์เซอร์ (localStorage) ----------
+        const HISTORY_KEY = 'youknowai-history-v1';
+        let memoryHistory = [];   // สำรองไว้ในกรณีเบราว์เซอร์ไม่ให้เก็บข้อมูล (เช่น โหมดส่วนตัว)
+
+        function loadHistory() {
+            try {
+                const raw = localStorage.getItem(HISTORY_KEY);
+                if (raw) {
+                    const list = JSON.parse(raw);
+                    if (Array.isArray(list)) return list;
+                }
+            } catch (e) { /* ใช้ค่าสำรองด้านล่าง */ }
+            return memoryHistory;
+        }
+
+        function saveHistory(list) {
+            memoryHistory = list;
+            try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* เก็บได้เฉพาะในหน้านี้ */ }
+        }
+
+        function recordAttempt(mode, score, total, byCat) {
+            const cats = {};
+            Object.keys(byCat).forEach(k => { cats[k] = [byCat[k].score, byCat[k].total]; });
+            const list = loadHistory().concat([{ mode, score, total, at: Date.now(), cats }]);
+            saveHistory(list.slice(-100));
+        }
+
+        function latestPre() {
+            const pres = loadHistory().filter(h => h.mode === 'pre');
+            return pres.length ? pres[pres.length - 1] : null;
+        }
+
+        // ผลก่อนเรียนครั้งล่าสุด ใช้เทียบกับหลังเรียน
+        let preResult = latestPre();
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // สลับตัวเลือก แต่ตัวเลือกอย่าง "ถูกทุกข้อ" ต้องอยู่ท้ายสุดเสมอ
+        function shuffleOptions(options, answerIdx) {
+            const items = options.map((text, idx) => ({ text, isCorrect: idx === answerIdx }));
+            const movable = shuffleArray(items.filter(o => !PINNED_LAST.test(o.text)));
+            const pinned = items.filter(o => PINNED_LAST.test(o.text));
+            return [...movable, ...pinned];
+        }
+
+        function initQuiz(mode) {
+            const state = quizState[mode];
+            state.currentIndex = 0;
+            state.score = 0;
+            state.isAnswered = false;
+            state.answers = [];
+            state.list = shuffleArray(questions.map(q => {
+                const opts = shuffleOptions(q.options, q.answer);
+                return {
+                    cat: q.cat,
+                    text: q.q,
+                    options: opts.map(o => o.text),
+                    answer: opts.findIndex(o => o.isCorrect),
+                    explain: q.explain
+                };
+            }));
+        }
+
+        const OPTION_LABELS = ['ก.', 'ข.', 'ค.', 'ง.'];
+
+        function loadQuestion(mode) {
+            const state = quizState[mode];
+            const p = state.prefix;
+            const total = state.list.length;
+            state.isAnswered = false;
+            const item = state.list[state.currentIndex];
+
+            document.getElementById(p + 'question-number').textContent = `ข้อที่ ${state.currentIndex + 1} / ${total}`;
+            document.getElementById(p + 'score-text').textContent = state.feedback ? `คะแนน: ${state.score}` : '';
+            document.getElementById(p + 'progress').style.width = `${(state.currentIndex / total) * 100}%`;
+            document.getElementById(p + 'cat').textContent = CATEGORIES[item.cat];
+            document.getElementById(p + 'question-title').textContent = `${state.currentIndex + 1}. ${item.text}`;
+
+            const list = document.getElementById(p + 'options-list');
+            list.innerHTML = '';
+            item.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = `${OPTION_LABELS[idx]} ${opt}`;
+                btn.onclick = () => checkAnswer(mode, idx, btn);
+                list.appendChild(btn);
+            });
+            document.getElementById(p + 'explanation-box').style.display = 'none';
+            document.getElementById(p + 'next-btn').style.display = 'none';
+        }
+
+        function checkAnswer(mode, selectedIndex, selectedBtn) {
+            const state = quizState[mode];
+            const p = state.prefix;
+            if (state.isAnswered) return;
+            state.isAnswered = true;
+
+            const item = state.list[state.currentIndex];
+            const buttons = document.getElementById(p + 'options-list').querySelectorAll('.option-btn');
+            buttons.forEach(b => b.disabled = true);
+
+            const correct = selectedIndex === item.answer;
+            if (correct) state.score++;
+            state.answers.push({ cat: item.cat, text: item.text, chosen: item.options[selectedIndex], right: item.options[item.answer], explain: item.explain, correct });
+
+            if (state.feedback) {
+                if (correct) {
+                    selectedBtn.classList.add('correct');
+                } else {
+                    selectedBtn.classList.add('wrong');
+                    buttons[item.answer].classList.add('correct');
+                }
+                document.getElementById(p + 'score-text').textContent = `คะแนน: ${state.score}`;
+                const box = document.getElementById(p + 'explanation-box');
+                box.textContent = '';
+                const strong = document.createElement('strong');
+                strong.textContent = 'คำอธิบาย: ';
+                box.appendChild(strong);
+                box.appendChild(document.createTextNode(item.explain));
+                box.style.display = 'block';
+            } else {
+                // ก่อนเรียน: ไม่เฉลย แค่ไฮไลต์ข้อที่เลือก
+                selectedBtn.classList.add('selected');
+            }
+
+            const nextBtn = document.getElementById(p + 'next-btn');
+            nextBtn.textContent = (state.currentIndex === state.list.length - 1) ? 'ดูผลคะแนน' : 'ข้อถัดไป';
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function nextQuestion(mode) {
+            const state = quizState[mode];
+            state.currentIndex++;
+            if (state.currentIndex < state.list.length) {
+                loadQuestion(mode);
+            } else {
+                showResult(mode);
+            }
+        }
+
+        // ---------- สรุปผล ----------
+        function levelOf(percent) {
+            if (percent >= 85) return { name: 'ระดับ: ยอดเยี่ยม', msg: 'ยอดเยี่ยมมาก! คุณเข้าใจเนื้อหา AI และการใช้งานทั้ง 5 ด้านอย่างครบถ้วน' };
+            if (percent >= 60) return { name: 'ระดับ: ดี', msg: 'ทำได้ดีมาก! มีพื้นฐานความรู้เรื่อง AI ที่แข็งแรง' };
+            if (percent >= 40) return { name: 'ระดับ: พอใช้', msg: 'เริ่มเข้าใจแล้ว! ลองทบทวนหมวดที่คะแนนน้อยในหน้า "ความรู้" แล้วทำอีกครั้งนะครับ' };
+            return { name: 'ระดับ: ควรทบทวน', msg: 'เริ่มต้นได้ดี! ลองเข้าไปอ่านเนื้อหาในหน้า "ความรู้" แล้วมาลองทำบททดสอบอีกครั้งนะครับ' };
+        }
+
+        function scoreByCategory(answers) {
+            const result = {};
+            Object.keys(CATEGORIES).forEach(k => { result[k] = { score: 0, total: 0 }; });
+            answers.forEach(a => {
+                result[a.cat].total++;
+                if (a.correct) result[a.cat].score++;
+            });
+            return result;
+        }
+
+        function renderBreakdown(containerId, byCat) {
+            const box = document.getElementById(containerId);
+            box.innerHTML = '';
+            Object.keys(CATEGORIES).forEach(k => {
+                const { score, total } = byCat[k];
+                const pct = total ? Math.round((score / total) * 100) : 0;
+                const row = document.createElement('div');
+                row.className = 'cat-row';
+                const head = document.createElement('div');
+                head.className = 'cat-head';
+                const name = document.createElement('span');
+                name.textContent = CATEGORIES[k];
+                const val = document.createElement('span');
+                val.textContent = `${score} / ${total}`;
+                head.append(name, val);
+                const track = document.createElement('div');
+                track.className = 'track';
+                const fill = document.createElement('div');
+                fill.className = 'fill' + (pct < 60 ? ' low' : '');
+                fill.style.width = pct + '%';
+                track.appendChild(fill);
+                row.append(head, track);
+                box.appendChild(row);
+            });
+        }
+
+        function renderCompare(containerId, postScore, total) {
+            const box = document.getElementById(containerId);
+            box.innerHTML = '';
+            if (!preResult) {
+                const p = document.createElement('p');
+                p.style.margin = '0';
+                p.textContent = 'ยังไม่มีผลแบบทดสอบก่อนเรียน ลองทำแบบทดสอบก่อนเรียนก่อน แล้วกลับมาเทียบคะแนนได้ที่นี่';
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.textContent = 'ไปทำแบบทดสอบก่อนเรียน';
+                btn.onclick = () => showPage('prequiz');
+                box.append(p, btn);
+                return;
+            }
+            const diff = postScore - preResult.score;
+            const wrap = document.createElement('div');
+            wrap.className = 'compare';
+            const mk = (label, value) => {
+                const d = document.createElement('div');
+                const n = document.createElement('div');
+                n.className = 'num';
+                n.textContent = value;
+                const l = document.createElement('small');
+                l.textContent = label;
+                d.append(n, l);
+                return d;
+            };
+            const arrow = document.createElement('div');
+            arrow.textContent = '➜';
+            const gain = document.createElement('div');
+            gain.className = 'gain ' + (diff > 0 ? 'up' : diff < 0 ? 'down' : '');
+            gain.textContent = diff > 0 ? `เพิ่มขึ้น ${diff} คะแนน` : diff < 0 ? `ลดลง ${-diff} คะแนน` : 'คะแนนเท่าเดิม';
+            wrap.append(mk('ก่อนเรียน', `${preResult.score} / ${preResult.total}`), arrow, mk('หลังเรียน', `${postScore} / ${total}`), gain);
+            box.appendChild(wrap);
+        }
+
+        function renderReview(answers) {
+            const title = document.getElementById('post-review-title');
+            const box = document.getElementById('post-review');
+            box.innerHTML = '';
+            const wrong = answers.filter(a => !a.correct);
+            if (wrong.length === 0) {
+                title.textContent = 'ข้อที่ตอบผิด';
+                const p = document.createElement('p');
+                p.style.margin = '0';
+                p.textContent = 'ไม่มีข้อที่ตอบผิดเลย เยี่ยมมาก!';
+                box.appendChild(p);
+                return;
+            }
+            title.textContent = `ข้อที่ตอบผิด (${wrong.length} ข้อ) ทบทวนเฉลยได้ที่นี่`;
+            wrong.forEach(a => {
+                const item = document.createElement('div');
+                item.className = 'review-item';
+                const q = document.createElement('div');
+                q.className = 'rq';
+                q.textContent = a.text;
+                const mine = document.createElement('div');
+                mine.className = 'mine';
+                mine.textContent = `✗ คุณตอบ: ${a.chosen}`;
+                const right = document.createElement('div');
+                right.className = 'right';
+                right.textContent = `✓ คำตอบที่ถูก: ${a.right}`;
+                const why = document.createElement('div');
+                why.className = 'why';
+                why.textContent = a.explain;
+                item.append(q, mine, right, why);
+                box.appendChild(item);
+            });
+        }
+
+        function showResult(mode) {
+            const state = quizState[mode];
+            const p = state.prefix;
+            const total = state.list.length;
+            const percent = (state.score / total) * 100;
+            const level = levelOf(percent);
+            const byCat = scoreByCategory(state.answers);
+
+            state.completed = true;
+            document.getElementById(p + 'quiz-area').style.display = 'none';
+            document.getElementById(p + 'result-area').style.display = 'block';
+            document.getElementById(p + 'final-score').textContent = `คุณได้ ${state.score} / ${total} คะแนน`;
+            document.getElementById(p + 'result-level').textContent = level.name;
+            document.getElementById(p + 'result-message').textContent = level.msg;
+            renderBreakdown(p + 'breakdown', byCat);
+
+            if (mode === 'post') {
+                // เทียบกับก่อนเรียนครั้งล่าสุดก่อนบันทึกผลรอบนี้
+                renderCompare('post-compare', state.score, total);
+                renderReview(state.answers);
+            }
+            recordAttempt(mode, state.score, total, byCat);
+            preResult = latestPre();
+            renderHistory(p + 'history');
+        }
+
+        // ---------- ประวัติผล ----------
+        function formatDate(ms) {
+            try { return new Date(ms).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }); }
+            catch (e) { return new Date(ms).toISOString().slice(0, 16).replace('T', ' '); }
+        }
+
+        function renderHistory(containerId) {
+            const box = document.getElementById(containerId);
+            box.innerHTML = '';
+            const list = loadHistory();
+
+            const note = document.createElement('p');
+            note.className = 'history-note';
+            note.textContent = 'ผลถูกเก็บไว้ในเบราว์เซอร์ของเครื่องนี้ ปิดหน้าเว็บแล้วเปิดใหม่ก็ยังอยู่ (ถ้าเปลี่ยนเครื่องหรือเบราว์เซอร์ ให้กดดาวน์โหลดเก็บไว้)';
+            box.appendChild(note);
+
+            if (list.length === 0) {
+                const empty = document.createElement('p');
+                empty.style.margin = '0';
+                empty.textContent = 'ยังไม่มีประวัติ';
+                box.appendChild(empty);
+                return;
+            }
+
+            const shown = list.slice(-10).reverse();
+            const wrap = document.createElement('div');
+            wrap.className = 'history-wrap';
+            const table = document.createElement('table');
+            table.className = 'history-table';
+            const thead = document.createElement('thead');
+            const headRow = document.createElement('tr');
+            ['ครั้งที่', 'วันที่-เวลา', 'แบบทดสอบ', 'คะแนน'].forEach(t => {
+                const th = document.createElement('th');
+                th.textContent = t;
+                headRow.appendChild(th);
+            });
+            thead.appendChild(headRow);
+            const tbody = document.createElement('tbody');
+            shown.forEach((h, i) => {
+                const tr = document.createElement('tr');
+                if (i === 0) tr.className = 'is-latest';
+                const no = list.length - i;
+                [String(no), formatDate(h.at), h.mode === 'pre' ? 'ก่อนเรียน' : 'หลังเรียน', `${h.score} / ${h.total}`].forEach(t => {
+                    const td = document.createElement('td');
+                    td.textContent = t;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.append(thead, tbody);
+            wrap.appendChild(table);
+            box.appendChild(wrap);
+
+            const dl = document.createElement('button');
+            dl.className = 'action-btn ghost';
+            dl.type = 'button';
+            dl.textContent = '⬇ ดาวน์โหลดผล (ไฟล์ CSV)';
+            dl.onclick = downloadHistory;
+            const clear = document.createElement('button');
+            clear.className = 'action-btn ghost';
+            clear.type = 'button';
+            clear.textContent = '🗑 ล้างประวัติ';
+            clear.onclick = clearHistory;
+            box.append(dl, clear);
+        }
+
+        function downloadHistory() {
+            const list = loadHistory();
+            const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+            const header = ['ครั้งที่', 'วันที่-เวลา', 'แบบทดสอบ', 'คะแนน', 'คะแนนเต็ม', 'เปอร์เซ็นต์']
+                .concat(Object.keys(CATEGORIES).map(k => 'หมวด: ' + CATEGORIES[k]));
+            const rows = list.map((h, i) => [
+                i + 1, formatDate(h.at), h.mode === 'pre' ? 'ก่อนเรียน' : 'หลังเรียน', h.score, h.total,
+                Math.round((h.score / h.total) * 100) + '%'
+            ].concat(Object.keys(CATEGORIES).map(k => (h.cats && h.cats[k]) ? `${h.cats[k][0]}/${h.cats[k][1]}` : '-')));
+            // ใส่ BOM ให้ Excel อ่านภาษาไทยได้ถูกต้อง
+            const csv = '\ufeff' + [header].concat(rows).map(r => r.map(q).join(',')).join('\r\n');
+            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'youknowai-results.csv';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function clearHistory() {
+            if (!confirm('ต้องการล้างประวัติผลทั้งหมดในเครื่องนี้ใช่ไหม? ล้างแล้วกู้คืนไม่ได้')) return;
+            saveHistory([]);
+            preResult = null;
+            ['pre-history', 'post-history'].forEach(id => renderHistory(id));
+            // ถ้าหน้าสรุปหลังเรียนเปิดค้างอยู่ ให้อัปเดตส่วนเปรียบเทียบด้วย
+            const post = quizState.post;
+            if (post.completed) renderCompare('post-compare', post.score, post.list.length);
+        }
+
+        // ---------- ธีม สว่าง/มืด ----------
+        function currentTheme() {
+            return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('theme-toggle');
+            if (btn) {
+                btn.textContent = theme === 'dark' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+                btn.setAttribute('aria-label', theme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด');
+            }
+        }
+
+        function toggleTheme() {
+            const next = currentTheme() === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+            try { localStorage.setItem('youknowai-theme', next); } catch (e) { /* ไม่เป็นไร ใช้ได้เฉพาะรอบนี้ */ }
+        }
+
+        function restartQuiz(mode) {
+            const p = quizState[mode].prefix;
+            quizState[mode].completed = false;
+            document.getElementById(p + 'result-area').style.display = 'none';
+            document.getElementById(p + 'quiz-area').style.display = 'block';
+            initQuiz(mode);
+            loadQuestion(mode);
+        }
+
+        // เริ่มทั้งสองแบบทดสอบเมื่อโหลดหน้าเว็บเสร็จ
+        document.addEventListener('DOMContentLoaded', function () {
+            applyTheme(currentTheme());
+            ['pre', 'post'].forEach(mode => {
+                initQuiz(mode);
+                loadQuestion(mode);
+            });
+        });
+    </script>
+</body>
+</html>
